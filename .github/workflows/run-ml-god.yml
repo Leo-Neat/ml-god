@@ -1,0 +1,28 @@
+name: Run ml_god.py monthly
+
+on:
+  schedule:
+    - cron: '0 0 1 * *' # Runs at 00:00 on the 1st of every month
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install Git
+        run: sudo apt-get update && sudo apt-get install -y git
+      - name: Run ml_god.py
+        run: python3 ml_god.py
+      - name: Push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add -A
+          git commit -m "Automated run of ml_god.py" || echo "No changes to commit"
+          git push --set-upstream origin main
